@@ -12,6 +12,7 @@ import { useSiteOnlineCount } from '@/hooks/usePresence';
 import { useRecentTags } from '@/hooks/useRecentTags';
 import { POST_TTL_HOURS, TAG_MAX_LENGTH } from '@/lib/config';
 import { fetchWifiBoard, isOnCellular } from '@/lib/network';
+import { createRoom, isValidRoomCode, normalizeRoomCode } from '@/lib/rooms';
 import { isSupabaseConfigured } from '@/lib/supabase';
 import { isGenericSsid, isValidTag, normalizeTag, PLACE_CATEGORIES } from '@/lib/tags';
 import { colors, fonts } from '@/lib/theme';
@@ -28,7 +29,7 @@ import { describeSsidFailure, detectSsid } from '@/lib/wifi';
  *   4) 지금 활발한 보드
  */
 export default function PlacePicker() {
-  const { next, wifi } = useLocalSearchParams<{ next?: string; wifi?: string }>();
+  const { next, wifi, room } = useLocalSearchParams<{ next?: string; wifi?: string; room?: string }>();
   const [input, setInput] = useState(next ?? ''); // 공유 링크로 들어왔으면 그 보드를 미리 채워둔다
   const [category, setCategory] = useState<string | null>(null);
   const [detecting, setDetecting] = useState(false);
@@ -53,6 +54,37 @@ export default function PlacePicker() {
   );
 
   const refresh = () => Promise.all([reloadBoards(), loadWifiCount()]);
+
+  const [roomCode, setRoomCode] = useState('');
+  const [roomNote, setRoomNote] = useState<string | null>(null);
+  const [creatingRoom, setCreatingRoom] = useState(false);
+
+  const makeRoom = async () => {
+    if (!agreed) {
+      setConsentNudge(true);
+      return;
+    }
+    setCreatingRoom(true);
+    setRoomNote(null);
+    const result = await createRoom();
+    setCreatingRoom(false);
+    if ('error' in result) setRoomNote(result.error);
+    else router.push({ pathname: '/room/[code]', params: { code: result.code } });
+  };
+
+  const enterRoom = () => {
+    if (!agreed) {
+      setConsentNudge(true);
+      return;
+    }
+    const code = normalizeRoomCode(roomCode);
+    if (!isValidRoomCode(code)) {
+      setRoomNote('코드 6자리를 확인해 주세요 (숫자 0·1, 영문 O·I 는 쓰지 않아요).');
+      return;
+    }
+    setRoomNote(null);
+    router.push({ pathname: '/room/[code]', params: { code } });
+  };
 
   const enterWifi = () => {
     if (!agreed) {
@@ -137,6 +169,10 @@ export default function PlacePicker() {
                   router.replace('/wifi');
                   return;
                 }
+                if (room) {
+                  router.replace({ pathname: '/room/[code]', params: { code: room } });
+                  return;
+                }
                 const target = normalizeTag(next ?? '');
                 if (isValidTag(target)) {
                   remember(target);
@@ -157,6 +193,38 @@ export default function PlacePicker() {
           {wifiCount ? `  지금 글 ${wifiCount}개` : ''}
         </Text>
       </Pressable>
+
+      <View style={styles.roomCard}>
+        <Text style={styles.roomTitle}>🔒 초대 코드 방</Text>
+        <Text style={styles.roomSub}>
+          핫스팟 모임처럼 몇 명끼리만 쓰는 방이에요. 코드를 아는 사람만 들어오고, 목록에도 안 나와요.
+        </Text>
+        <Pressable style={styles.roomCreate} onPress={makeRoom} disabled={creatingRoom}>
+          {creatingRoom ? (
+            <ActivityIndicator color={colors.accentText} />
+          ) : (
+            <Text style={styles.roomCreateText}>새 방 만들기</Text>
+          )}
+        </Pressable>
+        <View style={styles.roomJoinRow}>
+          <TextInput
+            style={styles.roomInput}
+            value={roomCode}
+            onChangeText={(t) => setRoomCode(normalizeRoomCode(t))}
+            placeholder="코드 6자리"
+            placeholderTextColor={colors.textDim}
+            autoCapitalize="characters"
+            autoCorrect={false}
+            maxLength={7}
+            returnKeyType="go"
+            onSubmitEditing={enterRoom}
+          />
+          <Pressable style={styles.roomJoin} onPress={enterRoom}>
+            <Text style={styles.roomJoinText}>입장</Text>
+          </Pressable>
+        </View>
+        {roomNote && <Text style={styles.roomNote}>{roomNote}</Text>}
+      </View>
 
       <Text style={styles.or}>또는 장소 이름으로</Text>
 
@@ -266,6 +334,46 @@ const styles = StyleSheet.create({
   },
   wifiBoardTitle: { color: colors.accentText, fontSize: 22, fontFamily: fonts?.brand },
   wifiBoardSub: { color: colors.accentText, fontSize: 13, lineHeight: 19, opacity: 0.8 },
+  roomCard: {
+    backgroundColor: colors.surface,
+    borderRadius: 16,
+    borderWidth: 1,
+    borderColor: colors.border,
+    padding: 16,
+    gap: 10,
+  },
+  roomTitle: { color: colors.text, fontSize: 20, fontFamily: fonts?.brand },
+  roomSub: { color: colors.textDim, fontSize: 13, lineHeight: 19 },
+  roomCreate: {
+    height: 46,
+    borderRadius: 12,
+    borderWidth: 1,
+    borderColor: colors.accent,
+    justifyContent: 'center',
+    alignItems: 'center',
+  },
+  roomCreateText: { color: colors.accent, fontWeight: '800', fontSize: 15 },
+  roomJoinRow: { flexDirection: 'row', gap: 8 },
+  roomInput: {
+    flex: 1,
+    height: 46,
+    borderRadius: 12,
+    backgroundColor: colors.surfaceHigh,
+    color: colors.text,
+    paddingHorizontal: 14,
+    fontSize: 18,
+    letterSpacing: 3,
+    fontWeight: '700',
+  },
+  roomJoin: {
+    height: 46,
+    paddingHorizontal: 20,
+    borderRadius: 12,
+    backgroundColor: colors.surfaceHigh,
+    justifyContent: 'center',
+  },
+  roomJoinText: { color: colors.text, fontWeight: '700', fontSize: 15 },
+  roomNote: { color: colors.danger, fontSize: 13 },
   or: { color: colors.textDim, fontSize: 13, textAlign: 'center', marginTop: 12 },
   wifiButton: {
     height: 48,

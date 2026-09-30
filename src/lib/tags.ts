@@ -18,8 +18,8 @@ export function normalizeTag(input: string): string {
 }
 
 export function isValidTag(tag: string): boolean {
-  // "wifi-..." 는 서버가 네트워크로 만들어 주는 와이파이 보드 전용 키
-  return tag.length >= 2 && tag.length <= TAG_MAX_LENGTH && !tag.startsWith('wifi-');
+  // "wifi-...", "room-..." 은 서버가 만들어 주는 와이파이 보드·초대 코드 방 전용 키
+  return tag.length >= 2 && tag.length <= TAG_MAX_LENGTH && !tag.startsWith('wifi-') && !tag.startsWith('room-');
 }
 
 /** 장소 이름 앞에 붙일 수 있는 빠른 선택 카테고리 */

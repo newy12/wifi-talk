@@ -8,6 +8,14 @@ type Status = 'loading' | 'live' | 'offline' | 'error';
 
 const POST_COLUMNS = 'id, board_key, body, author_tag, created_at, expires_at';
 
+/**
+ * 초대 코드 방의 글은 "그 방의 키를 안다"는 증명(x-board-key 헤더)이 있어야 서버가 보여준다.
+ * (board_key=like.room-* 같은 목록 조회로 남의 방을 훔쳐보지 못하게)
+ */
+function withBoardHeader<T extends { setHeader(name: string, value: string): T }>(builder: T, boardKey: string): T {
+  return boardKey.startsWith('room-') ? builder.setHeader('x-board-key', boardKey) : builder;
+}
+
 function liveNewestFirst(posts: Iterable<Post>): Post[] {
   const now = Date.now();
   return [...posts]
@@ -26,6 +34,7 @@ export const WRONG_NETWORK_MESSAGE = '와이파이가 바뀌었어요. 지금 �
 
 const ERROR_MESSAGES: Record<string, string> = {
   WRONG_NETWORK: WRONG_NETWORK_MESSAGE,
+  ROOM_NOT_FOUND: '이 방이 사라졌어요. 24시간 동안 글이 없으면 방이 없어져요.',
   RATE_LIMIT_AUTHOR: '너무 빨라요! 10초 뒤에 다시 남겨주세요.',
   RATE_LIMIT_BOARD: '지금 이 보드에 글이 너무 몰리고 있어요. 잠시 후 다시 시도해 주세요.',
   BANNED_WORD: '욕설이나 비속어가 포함되어 있어요. 표현을 바꿔주세요.',
@@ -50,12 +59,15 @@ export function useBoardPosts(boardKey: string) {
     let active = true;
 
     const refetch = async () => {
-      const { data, error } = await client
-        .from('posts')
-        .select(POST_COLUMNS)
-        .eq('board_key', boardKey)
-        .order('id', { ascending: false })
-        .limit(BOARD_MAX_POSTS);
+      const { data, error } = await withBoardHeader(
+        client
+          .from('posts')
+          .select(POST_COLUMNS)
+          .eq('board_key', boardKey)
+          .order('id', { ascending: false })
+          .limit(BOARD_MAX_POSTS),
+        boardKey,
+      );
       if (!active) return;
       if (error) {
         setStatus('error');
@@ -107,11 +119,14 @@ export function useBoardPosts(boardKey: string) {
       if (!body) return '내용을 입력해 주세요.';
       if (body.length > POST_MAX_LENGTH) return `${POST_MAX_LENGTH}자 이내로 적어주세요.`;
 
-      const { data, error } = await supabase
-        .from('posts')
-        .insert({ board_key: boardKey, body, author_tag: await getAuthorTag() })
-        .select(POST_COLUMNS)
-        .single();
+      const { data, error } = await withBoardHeader(
+        supabase
+          .from('posts')
+          .insert({ board_key: boardKey, body, author_tag: await getAuthorTag() })
+          .select(POST_COLUMNS)
+          .single(),
+        boardKey,
+      );
       if (error) {
         const code = Object.keys(ERROR_MESSAGES).find((k) => error.message.includes(k));
         return code ? ERROR_MESSAGES[code] : `전송 실패: ${error.message}`;
@@ -124,15 +139,21 @@ export function useBoardPosts(boardKey: string) {
   );
 
   /** 서버에 신고를 기록한다. 누적 신고 시 모두에게 숨겨진다. (내 화면에서 숨기는 건 useHiddenContent) */
-  const report = useCallback(async (postId: number, reason: ReportReason): Promise<string | null> => {
-    if (!supabase) return 'Supabase 설정이 필요합니다.';
-    const { error } = await supabase.rpc('report_post', {
-      p_post_id: postId,
-      p_reporter_tag: await getAuthorTag(),
-      p_reason: reason,
-    });
-    return error ? `신고 실패: ${error.message}` : null;
-  }, []);
+  const report = useCallback(
+    async (postId: number, reason: ReportReason): Promise<string | null> => {
+      if (!supabase) return 'Supabase 설정이 필요합니다.';
+      const { error } = await withBoardHeader(
+        supabase.rpc('report_post', {
+          p_post_id: postId,
+          p_reporter_tag: await getAuthorTag(),
+          p_reason: reason,
+        }),
+        boardKey,
+      );
+      return error ? `신고 실패: ${error.message}` : null;
+    },
+    [boardKey],
+  );
 
   return { posts, status, error, submit, report };
 }

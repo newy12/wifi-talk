@@ -1,4 +1,4 @@
-import { useCallback, useEffect, useMemo, useState } from 'react';
+import { useCallback, useEffect, useMemo, useState, type ReactNode } from 'react';
 import { ActivityIndicator, FlatList, KeyboardAvoidingView, Platform, Pressable, StyleSheet, View } from 'react-native';
 import { Text } from '@/components/Typography';
 import { router, Stack } from 'expo-router';
@@ -30,12 +30,14 @@ type Props = {
   onShare: () => Promise<string | null>;
   /** 목록 위에 띄울 안내 (예: 네트워크가 바뀌어 보드를 옮김) */
   banner?: string | null;
+  /** 상태 줄 아래에 끼워 넣을 내용 (예: 초대 코드 방의 코드·QR) */
+  topSlot?: ReactNode;
   /** 이 보드 글쓰기가 WRONG_NETWORK 로 거부됐을 때 */
   onWrongNetwork?: () => void;
 };
 
 /** 보드 화면 공통: 실시간 글 목록 + 작성 + 신고/차단. 장소 태그 보드와 와이파이 보드가 함께 쓴다. */
-export function BoardView({ boardKey, title, shareLabel, onShare, banner, onWrongNetwork }: Props) {
+export function BoardView({ boardKey, title, shareLabel, onShare, banner, topSlot, onWrongNetwork }: Props) {
   const { posts, status, error, submit, report } = useBoardPosts(boardKey);
   const { isHidden, hidePost, blockAuthor, unblockAuthor, blockedAuthors } = useHiddenContent();
   const visiblePosts = useMemo(() => posts.filter((p) => !isHidden(p)), [posts, isHidden]);
@@ -118,6 +120,7 @@ export function BoardView({ boardKey, title, shareLabel, onShare, banner, onWron
       </View>
 
       {banner ? <Text style={styles.banner}>{banner}</Text> : null}
+      {topSlot}
 
       {blockedHereTotal > 0 && (
         <View style={styles.blocked}>
