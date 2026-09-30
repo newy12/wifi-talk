@@ -1,14 +1,6 @@
 import { useCallback, useState } from 'react';
-import {
-  ActivityIndicator,
-  Platform,
-  Pressable,
-  ScrollView,
-  StyleSheet,
-  Text,
-  TextInput,
-  View,
-} from 'react-native';
+import { ActivityIndicator, Platform, Pressable, ScrollView, StyleSheet, View } from 'react-native';
+import { Text, TextInput } from '@/components/Typography';
 import { Link, router, useFocusEffect, useLocalSearchParams } from 'expo-router';
 import { Chip } from '@/components/Chip';
 import { DonationCard } from '@/components/DonationCard';
@@ -20,7 +12,7 @@ import { POST_TTL_HOURS, TAG_MAX_LENGTH } from '@/lib/config';
 import { fetchWifiBoard, isOnCellular } from '@/lib/network';
 import { isSupabaseConfigured } from '@/lib/supabase';
 import { isGenericSsid, isValidTag, normalizeTag, PLACE_CATEGORIES } from '@/lib/tags';
-import { colors } from '@/lib/theme';
+import { colors, fonts } from '@/lib/theme';
 import { timeAgo } from '@/lib/time';
 import { describeSsidFailure, detectSsid } from '@/lib/wifi';
 
@@ -234,7 +226,7 @@ export default function PlacePicker() {
 const styles = StyleSheet.create({
   screen: { flex: 1, backgroundColor: colors.bg },
   content: { padding: 20, gap: 12, paddingBottom: 48, width: '100%', maxWidth: 640, alignSelf: 'center' },
-  hero: { color: colors.text, fontSize: 28, fontWeight: '800' },
+  hero: { color: colors.text, fontSize: 32, fontFamily: fonts?.brand, lineHeight: 40 },
   sub: { color: colors.textDim, fontSize: 14, lineHeight: 20 },
   wifiBoard: {
     backgroundColor: colors.accent,
@@ -243,7 +235,7 @@ const styles = StyleSheet.create({
     gap: 6,
     marginTop: 8,
   },
-  wifiBoardTitle: { color: colors.accentText, fontSize: 19, fontWeight: '800' },
+  wifiBoardTitle: { color: colors.accentText, fontSize: 22, fontFamily: fonts?.brand },
   wifiBoardSub: { color: colors.accentText, fontSize: 13, lineHeight: 19, opacity: 0.8 },
   or: { color: colors.textDim, fontSize: 13, textAlign: 'center', marginTop: 12 },
   wifiButton: {

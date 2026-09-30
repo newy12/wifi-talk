@@ -1,11 +1,12 @@
 import { useCallback, useEffect, useRef, useState } from 'react';
-import { ActivityIndicator, AppState, Platform, Pressable, StyleSheet, Text, View } from 'react-native';
+import { ActivityIndicator, AppState, Platform, Pressable, StyleSheet, View } from 'react-native';
+import { Text } from '@/components/Typography';
 import { Redirect, router, Stack } from 'expo-router';
 import { BoardView } from '@/components/BoardView';
 import { useConsent } from '@/hooks/useConsent';
 import { fetchWifiBoard, isOnCellular } from '@/lib/network';
 import { shareLink } from '@/lib/share';
-import { colors } from '@/lib/theme';
+import { colors, fonts } from '@/lib/theme';
 
 type State =
   | { kind: 'checking' }
@@ -156,7 +157,7 @@ const styles = StyleSheet.create({
     padding: 24,
     gap: 14,
   },
-  title: { color: colors.text, fontSize: 20, fontWeight: '800', textAlign: 'center' },
+  title: { color: colors.text, fontSize: 24, fontFamily: fonts?.brand, lineHeight: 32, textAlign: 'center' },
   text: { color: colors.textDim, fontSize: 14, lineHeight: 21, textAlign: 'center', maxWidth: 420 },
   button: { backgroundColor: colors.accent, borderRadius: 12, paddingHorizontal: 24, paddingVertical: 12, marginTop: 8 },
   buttonText: { color: colors.accentText, fontWeight: '800', fontSize: 15 },

@@ -1,7 +1,8 @@
 import { useState } from 'react';
-import { ActivityIndicator, Pressable, StyleSheet, Text, TextInput, View } from 'react-native';
+import { ActivityIndicator, Pressable, StyleSheet, View } from 'react-native';
+import { Text, TextInput } from '@/components/Typography';
 import { POST_MAX_LENGTH } from '@/lib/config';
-import { colors } from '@/lib/theme';
+import { colors, fonts } from '@/lib/theme';
 
 type Props = { onSubmit: (body: string) => Promise<string | null> };
 
@@ -76,7 +77,8 @@ const styles = StyleSheet.create({
     borderRadius: 12,
     paddingHorizontal: 12,
     paddingVertical: 10,
-    fontSize: 15,
+    fontSize: 19,
+    fontFamily: fonts?.post,
   },
   button: {
     height: 44,

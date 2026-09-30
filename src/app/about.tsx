@@ -1,7 +1,8 @@
-import { Linking, Pressable, ScrollView, StyleSheet, Text } from 'react-native';
+import { Linking, Pressable, ScrollView, StyleSheet } from 'react-native';
+import { Text } from '@/components/Typography';
 import { useHiddenContent } from '@/hooks/useHiddenContent';
 import { CONTACT_EMAIL, POST_TTL_HOURS, REPORT_HIDE_THRESHOLD } from '@/lib/config';
-import { colors } from '@/lib/theme';
+import { colors, fonts } from '@/lib/theme';
 
 /** 운영정책 + 개인정보처리방침. 스토어 심사용 공개 URL 로도 그대로 쓸 수 있다 (웹: /about). */
 export default function AboutScreen() {
@@ -11,7 +12,7 @@ export default function AboutScreen() {
     <ScrollView style={styles.screen} contentContainerStyle={styles.content}>
       <Text style={styles.h1}>운영정책</Text>
       <Text style={styles.p}>
-        WiFi Graffiti 는 같은 장소에 있는 사람들이 익명으로 짧은 글을 남기는 공간입니다. 아래 내용을 게시하면 안 됩니다.
+        담벼락은 같은 와이파이, 같은 장소에 있는 사람들이 익명으로 짧은 글을 남기는 공간입니다. 아래 내용을 게시하면 안 됩니다.
       </Text>
       <Text style={styles.li}>• 욕설, 혐오, 차별, 특정인을 향한 괴롭힘이나 위협</Text>
       <Text style={styles.li}>• 전화번호, 실명, 주소 등 타인의 개인정보</Text>
@@ -73,7 +74,7 @@ export default function AboutScreen() {
 const styles = StyleSheet.create({
   screen: { flex: 1, backgroundColor: colors.bg },
   content: { padding: 20, paddingBottom: 48, gap: 8, width: '100%', maxWidth: 640, alignSelf: 'center' },
-  h1: { color: colors.text, fontSize: 22, fontWeight: '800', marginTop: 16 },
+  h1: { color: colors.text, fontSize: 26, fontFamily: fonts?.brand, marginTop: 16 },
   h2: { color: colors.text, fontSize: 16, fontWeight: '700', marginTop: 12 },
   p: { color: colors.textDim, fontSize: 14, lineHeight: 21 },
   li: { color: colors.textDim, fontSize: 14, lineHeight: 21, paddingLeft: 4 },

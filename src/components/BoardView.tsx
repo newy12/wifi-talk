@@ -1,5 +1,6 @@
 import { useCallback, useEffect, useMemo, useState } from 'react';
-import { ActivityIndicator, FlatList, KeyboardAvoidingView, Platform, Pressable, StyleSheet, Text, View } from 'react-native';
+import { ActivityIndicator, FlatList, KeyboardAvoidingView, Platform, Pressable, StyleSheet, View } from 'react-native';
+import { Text } from '@/components/Typography';
 import { router, Stack } from 'expo-router';
 import { useSafeAreaInsets } from 'react-native-safe-area-context';
 import { Composer } from './Composer';
@@ -158,9 +159,16 @@ const styles = StyleSheet.create({
     paddingHorizontal: 16,
     paddingVertical: 8,
   },
-  home: { paddingRight: 12, paddingVertical: 6 },
+  home: { marginLeft: 12, paddingRight: 12, paddingVertical: 6 },
   homeText: { color: colors.textDim, fontSize: 14 },
-  share: { paddingHorizontal: 12, paddingVertical: 6, borderRadius: 8, borderWidth: 1, borderColor: colors.border },
+  share: {
+    marginRight: 12,
+    paddingHorizontal: 12,
+    paddingVertical: 6,
+    borderRadius: 8,
+    borderWidth: 1,
+    borderColor: colors.border,
+  },
   shareText: { color: colors.accent, fontWeight: '600', fontSize: 13 },
   center: { flex: 1, justifyContent: 'center', alignItems: 'center', padding: 20 },
   list: { padding: 12, gap: 10, flexGrow: 1, width: '100%', maxWidth: 640, alignSelf: 'center' },

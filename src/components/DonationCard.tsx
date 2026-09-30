@@ -1,7 +1,8 @@
 import { useState } from 'react';
-import { Platform, Pressable, StyleSheet, Text, View } from 'react-native';
+import { Platform, Pressable, StyleSheet, View } from 'react-native';
+import { Text } from '@/components/Typography';
 import { DONATION_ACCOUNT } from '@/lib/config';
-import { colors } from '@/lib/theme';
+import { colors, fonts } from '@/lib/theme';
 
 /** 메인 하단 후원 카드: 계좌번호를 보여주고 누르면 복사한다. */
 export function DonationCard() {
@@ -25,7 +26,7 @@ export function DonationCard() {
     <View style={styles.card}>
       <Text style={styles.title}>☕ 개발자에게 커피 한 잔</Text>
       <Text style={styles.text}>
-        WiFi Graffiti 는 광고 없이 혼자 만들고 운영하고 있어요. 도움이 되셨다면 커피 한 잔으로 응원해 주세요!
+        담벼락은 광고 없이 혼자 만들고 운영하고 있어요. 도움이 되셨다면 커피 한 잔으로 응원해 주세요!
       </Text>
       <Pressable onPress={copy} style={({ pressed }) => [styles.account, pressed && styles.pressed]}>
         <View style={styles.accountText}>
@@ -50,7 +51,7 @@ const styles = StyleSheet.create({
     padding: 16,
     gap: 10,
   },
-  title: { color: colors.text, fontSize: 16, fontWeight: '800' },
+  title: { color: colors.text, fontSize: 19, fontFamily: fonts?.brand },
   text: { color: colors.textDim, fontSize: 13, lineHeight: 19 },
   account: {
     flexDirection: 'row',

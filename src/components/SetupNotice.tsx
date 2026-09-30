@@ -1,4 +1,5 @@
-import { StyleSheet, Text, View } from 'react-native';
+import { StyleSheet, View } from 'react-native';
+import { Text } from '@/components/Typography';
 import { colors } from '@/lib/theme';
 
 /** .env.local 이 없을 때 앱이 크래시하는 대신 보여주는 안내 */

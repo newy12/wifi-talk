@@ -1,7 +1,8 @@
 import { memo } from 'react';
-import { Pressable, StyleSheet, Text, View } from 'react-native';
+import { Pressable, StyleSheet, View } from 'react-native';
+import { Text } from '@/components/Typography';
 import type { Post } from '@/lib/supabase';
-import { colors } from '@/lib/theme';
+import { colors, fonts } from '@/lib/theme';
 import { timeAgo, timeLeft } from '@/lib/time';
 
 type Props = { post: Post; mine: boolean; now: number; onMenu: (post: Post) => void };
@@ -41,7 +42,7 @@ const styles = StyleSheet.create({
   author: { color: colors.textDim, fontSize: 12, fontWeight: '600' },
   authorMine: { color: colors.accent },
   time: { color: colors.textDim, fontSize: 12 },
-  body: { color: colors.text, fontSize: 16, lineHeight: 22 },
+  body: { color: colors.text, fontSize: 21, lineHeight: 26, fontFamily: fonts?.post },
   footer: { flexDirection: 'row', justifyContent: 'space-between', alignItems: 'center' },
   ttl: { color: colors.textDim, fontSize: 11 },
   menu: { color: colors.textDim, fontSize: 18, paddingHorizontal: 4 },

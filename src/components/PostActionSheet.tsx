@@ -1,5 +1,6 @@
 import { useState } from 'react';
-import { Modal, Pressable, StyleSheet, Text } from 'react-native';
+import { Modal, Pressable, StyleSheet } from 'react-native';
+import { Text } from '@/components/Typography';
 import { useSafeAreaInsets } from 'react-native-safe-area-context';
 import type { Post } from '@/lib/supabase';
 import { REPORT_REASONS, type ReportReason } from '@/lib/config';

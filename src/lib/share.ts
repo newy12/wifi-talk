@@ -8,7 +8,7 @@ import { Platform, Share } from 'react-native';
  * 반환값: 사용자에게 보여줄 결과 문구 (취소·공유 시트 사용 시 null)
  */
 export async function shareLink(path: string, text: string): Promise<string | null> {
-  const title = 'WiFi Graffiti';
+  const title = '담벼락';
 
   if (Platform.OS === 'web') {
     const url = `${window.location.origin}${path}`;
