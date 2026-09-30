@@ -46,14 +46,13 @@ npm run db:start && npm run env:local && npm run dev
 ## ☁️ 웹 배포 (무료)
 
 빌드 결과(`dist/`)는 정적 파일이라 무료 호스팅 어디에나 올릴 수 있습니다.
-`/board/...` 주소로 바로 들어와도 열리도록 SPA 설정이 들어 있습니다 (`wrangler.jsonc`, `vercel.json`).
+`/board/...` 주소로 바로 들어와도 열리도록 SPA 설정이 들어 있습니다 (`wrangler.jsonc`).
 
 | 호스팅 | 방법 | 무료 한도 |
 |---|---|---|
 | **Cloudflare Workers** (현재 사용 중) | `npm run deploy:web` (빌드 + 배포) | 정적 파일 요청 무제한 |
-| Vercel | GitHub 저장소 연결 (설정은 `vercel.json`이 자동 적용) | 월 100GB |
 
-**환경 변수 주의**: `EXPO_PUBLIC_*` 값은 **빌드할 때** 코드에 들어갑니다. 내 컴퓨터에서 빌드해 올리면 `.env.local`이 쓰이고, Vercel처럼 호스팅에서 빌드하면 그 대시보드에 `EXPO_PUBLIC_SUPABASE_URL`, `EXPO_PUBLIC_SUPABASE_ANON_KEY`를 등록해야 합니다.
+**환경 변수 주의**: `EXPO_PUBLIC_*` 값은 **빌드할 때** 코드에 들어갑니다. `npm run deploy:web`은 내 컴퓨터에서 빌드하므로 `.env.local`의 값이 쓰입니다.
 
 운영 Supabase: 프로젝트 `wiki-project` (ref `rwxfbdfjfpyzzqjxuvpn`, 싱가포르 리전). **7일 동안 요청이 없으면 일시정지**되니, 대시보드에서 Restore를 누르면 됩니다.
 
@@ -153,7 +152,6 @@ group by p.id order by p.report_count desc;
 wifi-talk/
 ├── app.json                  # Expo 설정 (권한, 엔타이틀먼트, 플러그인)
 ├── eas.json                  # EAS Build 프로필 (앱 출시 때 사용)
-├── vercel.json               # Vercel 배포 설정 (SPA 라우팅)
 ├── wrangler.jsonc            # Cloudflare Workers 배포 설정 (현재 운영)
 ├── public/                   # 웹 전용: index.html(메타/OG), manifest.json(PWA), 아이콘
 ├── .env.example              # Supabase 환경변수 템플릿
