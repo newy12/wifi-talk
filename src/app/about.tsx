@@ -4,6 +4,9 @@ import { useHiddenContent } from '@/hooks/useHiddenContent';
 import { CONTACT_EMAIL, POST_TTL_HOURS, REPORT_HIDE_THRESHOLD } from '@/lib/config';
 import { colors, fonts } from '@/lib/theme';
 
+/** GitHub Actions 자동 배포 때 커밋 ID 가 들어간다 (로컬 빌드에는 없음) */
+const APP_VERSION = process.env.EXPO_PUBLIC_APP_VERSION;
+
 /** 운영정책 + 개인정보처리방침. 스토어 심사용 공개 URL 로도 그대로 쓸 수 있다 (웹: /about). */
 export default function AboutScreen() {
   const { blockedAuthors, unblockAuthor, clearBlocked } = useHiddenContent();
@@ -79,6 +82,7 @@ export default function AboutScreen() {
           )}
         </>
       )}
+      {APP_VERSION ? <Text style={styles.version}>배포 버전 {APP_VERSION.slice(0, 7)}</Text> : null}
     </ScrollView>
   );
 }
@@ -113,4 +117,5 @@ const styles = StyleSheet.create({
   },
   blockedTag: { color: colors.text, fontSize: 15, fontWeight: '600' },
   clearAll: { marginTop: 8 },
+  version: { color: colors.textDim, fontSize: 11, textAlign: 'center', marginTop: 32, opacity: 0.6 },
 });

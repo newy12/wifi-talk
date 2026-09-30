@@ -24,6 +24,8 @@ jobs:
       # 공개용 값 (배포된 웹 파일에 원래 들어가는 값). 보안은 Supabase RLS 가 담당한다.
       EXPO_PUBLIC_SUPABASE_URL: https://rwxfbdfjfpyzzqjxuvpn.supabase.co
       EXPO_PUBLIC_SUPABASE_ANON_KEY: sb_publishable_Cn5jLCiAWZtvyScaiEW9Eg__dt087gc
+      # 운영정책 화면 맨 아래에 표시되는 배포 버전 (자동 배포가 반영됐는지 확인용)
+      EXPO_PUBLIC_APP_VERSION: ${{ github.sha }}
       CLOUDFLARE_ACCOUNT_ID: d4e4d71594cc8fcf8f7892af686c9843
       CLOUDFLARE_API_TOKEN: ${{ secrets.CLOUDFLARE_API_TOKEN }}
     steps:
