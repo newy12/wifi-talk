@@ -104,6 +104,7 @@ npm run db:start && npm run env:local && npm run dev
          ─▶ [AFTER INSERT 트리거] 보드당 최신 100개 초과분 즉시 삭제
 조회     ─▶ [RLS] 만료 전 + 신고 3건 미만 글만 보임
 정리     ─▶ [pg_cron] 10분마다 만료 글 물리 삭제 (신고 기록도 함께 삭제)
+         ─▶ [pg_cron] 매일 04:00(KST) 7일 지난 cron 실행 기록 삭제
 ```
 
 - 익명(anon) 역할은 글 `SELECT`·`INSERT`와 `report_post()` 호출만 가능 (수정·삭제·신고내역 조회 불가)
@@ -147,7 +148,8 @@ wifi-talk/
 │       ├── 20261001000000_init.sql        # 테이블, RLS, TTL, 도배 제한, Realtime, pg_cron
 │       ├── 20261001000100_moderation.sql  # 신고, 금칙어, 개인정보 필터
 │       ├── 20261001000200_wifi_boards.sql # 같은 와이파이 보드 (IP 해시, 네트워크 검증)
-│       └── 20261001000300_block_mobile_networks.sql # 이동통신 데이터망 IP 차단
+│       ├── 20261001000300_block_mobile_networks.sql # 이동통신 데이터망 IP 차단
+│       └── 20261001000400_purge_cron_history.sql    # cron 실행 기록 정리
 ├── docs/
 │   └── PERMISSIONS.md        # Android/iOS 권한 & 스토어 제출 가이드
 └── src/
