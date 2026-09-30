@@ -79,7 +79,7 @@ npm run db:start && npm run env:local && npm run dev
 
 ## 👀 접속자 수
 
-Supabase Realtime **Presence**로 첫 화면에 "지금 N명 접속 중", 보드에 "N명 보는 중"을 보여줍니다 (`src/hooks/usePresence.tsx`).
+Supabase Realtime **Presence**로 첫 화면에 "지금 N명이 접속중이에요", 보드에 "N명 보는 중"을 보여줍니다 (`src/hooks/usePresence.tsx`).
 기기의 익명 태그 기준이라 같은 기기의 탭 여러 개는 1명으로 셉니다. 서버에 저장하지 않고, 글 구독과 같은 웹소켓을 공유하므로 동시 접속 한도를 추가로 쓰지 않습니다.
 
 ## 🗺️ 장소 태그 보드 (SSID 제한 대응)

@@ -100,7 +100,7 @@ export default function PlacePicker() {
       {online ? (
         <View style={styles.online}>
           <View style={styles.onlineDot} />
-          <Text style={styles.onlineText}>지금 {online}명 접속 중</Text>
+          <Text style={styles.onlineText}>지금 {online}명이 접속중이에요</Text>
         </View>
       ) : null}
       <Text style={styles.hero}>지금 어디에 있나요?</Text>
