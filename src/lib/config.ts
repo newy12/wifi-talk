@@ -18,4 +18,4 @@ export const REPORT_REASONS = [
 export type ReportReason = (typeof REPORT_REASONS)[number]['value'];
 
 /** 스토어 제출 전 실제 운영자 연락처로 교체하세요 (App Store 1.2 필수 항목) */
-export const CONTACT_EMAIL = 'contact@example.com';
+export const CONTACT_EMAIL = 'newy12@naver.com';
