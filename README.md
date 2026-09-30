@@ -77,6 +77,11 @@ npm run db:start && npm run env:local && npm run dev
 
 구현: `supabase/migrations/20261001000200_wifi_boards.sql`, `src/app/wifi.tsx`, `src/lib/network.ts`
 
+## 👀 접속자 수
+
+Supabase Realtime **Presence**로 첫 화면에 "지금 N명 접속 중", 보드에 "N명 보는 중"을 보여줍니다 (`src/hooks/usePresence.tsx`).
+기기의 익명 태그 기준이라 같은 기기의 탭 여러 개는 1명으로 셉니다. 서버에 저장하지 않고, 글 구독과 같은 웹소켓을 공유하므로 동시 접속 한도를 추가로 쓰지 않습니다.
+
 ## 🗺️ 장소 태그 보드 (SSID 제한 대응)
 
 모바일 OS는 개인정보 보호 때문에 와이파이 이름(SSID) 접근을 강하게 막습니다 (위치 권한 + iOS 전용 엔타이틀먼트 필요, 웹은 불가능).

@@ -9,6 +9,7 @@ import { PostItem } from './PostItem';
 import { SetupNotice } from './SetupNotice';
 import { useBoardPosts, WRONG_NETWORK_MESSAGE } from '@/hooks/useBoardPosts';
 import { useHiddenContent } from '@/hooks/useHiddenContent';
+import { usePresenceCount } from '@/hooks/usePresence';
 import type { ReportReason } from '@/lib/config';
 import { getAuthorTag } from '@/lib/identity';
 import { isSupabaseConfigured, type Post } from '@/lib/supabase';
@@ -43,6 +44,7 @@ export function BoardView({ boardKey, title, shareLabel, onShare, banner, onWron
   const [me, setMe] = useState<string | null>(null);
   const [now, setNow] = useState(() => Date.now());
   const insets = useSafeAreaInsets();
+  const viewers = usePresenceCount(`board:${boardKey}`);
 
   useEffect(() => {
     getAuthorTag().then(setMe);
@@ -97,7 +99,9 @@ export function BoardView({ boardKey, title, shareLabel, onShare, banner, onWron
       />
 
       <View style={styles.statusBar}>
-        <Text style={[styles.status, status === 'live' && styles.statusLive]}>{STATUS_LABEL[status]}</Text>
+        <Text style={[styles.status, status === 'live' && styles.statusLive]}>{STATUS_LABEL[status]}
+          {status === 'live' && viewers ? ` · ${viewers}명 보는 중` : ''}
+        </Text>
         <Text style={styles.status} numberOfLines={1}>
           {shareNote ?? (me ? `나: ${me}` : '')}
         </Text>

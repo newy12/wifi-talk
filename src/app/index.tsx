@@ -7,6 +7,7 @@ import { DonationCard } from '@/components/DonationCard';
 import { SetupNotice } from '@/components/SetupNotice';
 import { useActiveBoards } from '@/hooks/useActiveBoards';
 import { useConsent } from '@/hooks/useConsent';
+import { useSiteOnlineCount } from '@/hooks/usePresence';
 import { useRecentTags } from '@/hooks/useRecentTags';
 import { POST_TTL_HOURS, TAG_MAX_LENGTH } from '@/lib/config';
 import { fetchWifiBoard, isOnCellular } from '@/lib/network';
@@ -36,6 +37,7 @@ export default function PlacePicker() {
   const { agreed, agree } = useConsent();
   const [consentNudge, setConsentNudge] = useState(false);
   const [wifiCount, setWifiCount] = useState<number | null>(null);
+  const online = useSiteOnlineCount();
 
   useFocusEffect(
     useCallback(() => {
@@ -95,6 +97,12 @@ export default function PlacePicker() {
 
   return (
     <ScrollView style={styles.screen} contentContainerStyle={styles.content} keyboardShouldPersistTaps="handled">
+      {online ? (
+        <View style={styles.online}>
+          <View style={styles.onlineDot} />
+          <Text style={styles.onlineText}>지금 {online}명 접속 중</Text>
+        </View>
+      ) : null}
       <Text style={styles.hero}>지금 어디에 있나요?</Text>
       <Text style={styles.sub}>
         같은 와이파이, 같은 장소에 있는 사람들끼리 익명으로 낙서를 나눠요. 모든 글은 {POST_TTL_HOURS}시간 뒤 사라집니다.
@@ -226,6 +234,20 @@ export default function PlacePicker() {
 const styles = StyleSheet.create({
   screen: { flex: 1, backgroundColor: colors.bg },
   content: { padding: 20, gap: 12, paddingBottom: 48, width: '100%', maxWidth: 640, alignSelf: 'center' },
+  online: {
+    flexDirection: 'row',
+    alignItems: 'center',
+    alignSelf: 'flex-start',
+    gap: 6,
+    paddingHorizontal: 10,
+    paddingVertical: 5,
+    borderRadius: 999,
+    backgroundColor: colors.surface,
+    borderWidth: 1,
+    borderColor: colors.border,
+  },
+  onlineDot: { width: 7, height: 7, borderRadius: 4, backgroundColor: colors.accent },
+  onlineText: { color: colors.text, fontSize: 12, fontWeight: '600' },
   hero: { color: colors.text, fontSize: 32, fontFamily: fonts?.brand, lineHeight: 40 },
   sub: { color: colors.textDim, fontSize: 14, lineHeight: 20 },
   wifiBoard: {
