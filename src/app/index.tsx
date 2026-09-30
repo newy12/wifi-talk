@@ -1,9 +1,10 @@
 import { useCallback, useState } from 'react';
-import { ActivityIndicator, Platform, Pressable, ScrollView, StyleSheet, View } from 'react-native';
+import { ActivityIndicator, Platform, Pressable, StyleSheet, View } from 'react-native';
 import { Text, TextInput } from '@/components/Typography';
 import { Link, router, useFocusEffect, useLocalSearchParams } from 'expo-router';
 import { Chip } from '@/components/Chip';
 import { DonationCard } from '@/components/DonationCard';
+import { PullToRefreshScrollView } from '@/components/PullToRefreshScrollView';
 import { SetupNotice } from '@/components/SetupNotice';
 import { useActiveBoards } from '@/hooks/useActiveBoards';
 import { useConsent } from '@/hooks/useConsent';
@@ -33,24 +34,25 @@ export default function PlacePicker() {
   const [detecting, setDetecting] = useState(false);
   const [wifiNote, setWifiNote] = useState<string | null>(null);
   const { tags: recent, remember, forget } = useRecentTags();
-  const activeBoards = useActiveBoards();
+  const { boards: activeBoards, reload: reloadBoards } = useActiveBoards();
   const { agreed, agree } = useConsent();
   const [consentNudge, setConsentNudge] = useState(false);
   const [wifiCount, setWifiCount] = useState<number | null>(null);
   const online = useSiteOnlineCount();
 
+  const loadWifiCount = useCallback(async () => {
+    // 데이터(LTE/5G)일 때의 개수는 통신사 IP 기준이라 의미가 없으므로 표시하지 않는다
+    const board = (await isOnCellular()) === true ? null : await fetchWifiBoard();
+    setWifiCount(board && !board.cellular ? board.post_count : null);
+  }, []);
+
   useFocusEffect(
     useCallback(() => {
-      let cancelled = false;
-      // 데이터(LTE/5G)일 때의 개수는 통신사 IP 기준이라 의미가 없으므로 표시하지 않는다
-      isOnCellular()
-        .then((cellular) => (cellular === true ? null : fetchWifiBoard()))
-        .then((b) => !cancelled && setWifiCount(b && !b.cellular ? b.post_count : null));
-      return () => {
-        cancelled = true;
-      };
-    }, []),
+      loadWifiCount();
+    }, [loadWifiCount]),
   );
+
+  const refresh = () => Promise.all([reloadBoards(), loadWifiCount()]);
 
   const enterWifi = () => {
     if (!agreed) {
@@ -96,7 +98,12 @@ export default function PlacePicker() {
   };
 
   return (
-    <ScrollView style={styles.screen} contentContainerStyle={styles.content} keyboardShouldPersistTaps="handled">
+    <PullToRefreshScrollView
+      onRefresh={refresh}
+      style={styles.screen}
+      contentContainerStyle={styles.content}
+      keyboardShouldPersistTaps="handled"
+    >
       {online ? (
         <View style={styles.online}>
           <View style={styles.onlineDot} />
@@ -227,7 +234,7 @@ export default function PlacePicker() {
       <Link href="/about" style={styles.footer}>
         운영정책 · 개인정보처리방침 · 차단 관리
       </Link>
-    </ScrollView>
+    </PullToRefreshScrollView>
   );
 }
 
