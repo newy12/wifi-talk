@@ -84,7 +84,7 @@ npm run db:start && npm run env:local && npm run dev
 - 보드 키 = `room-` + HMAC(서버 비밀키, 코드). 코드는 32^6 ≈ 10억 가지 (헷갈리는 0/O/1/I 제외), 서버가 무작위로 뽑음
 - REST 읽기는 `x-board-key` 헤더로 방 키를 아는 경우만 허용 → `like.room-*` 목록 조회로 훔쳐볼 수 없음
 - "지금 활발한 보드" 목록에 안 나옴. 방 만들기는 한 네트워크에서 10분에 20개까지
-- 24시간 동안 글이 없으면 방이 사라짐 (`purge-idle-rooms` cron)
+- 글이 없는 방은 만든 지 30분, 글이 있는 방은 마지막 글 24시간 뒤 사라짐 (`purge-idle-rooms` cron, 5분마다)
 
 구현: `supabase/migrations/20261001000500_invite_rooms.sql`, `src/app/room/[code].tsx`, `src/components/RoomInvite.tsx`, `src/lib/rooms.ts`
 
@@ -166,7 +166,9 @@ wifi-talk/
 │       ├── 20261001000200_wifi_boards.sql # 같은 와이파이 보드 (IP 해시, 네트워크 검증)
 │       ├── 20261001000300_block_mobile_networks.sql # 이동통신 데이터망 IP 차단
 │       ├── 20261001000400_purge_cron_history.sql    # cron 실행 기록 정리
-│       └── 20261001000500_invite_rooms.sql          # 초대 코드 방
+│       ├── 20261001000500_invite_rooms.sql          # 초대 코드 방
+│       ├── 20261001000600_room_rate_limit.sql       # 방 만들기 제한 완화
+│       └── 20261001000700_room_empty_ttl.sql        # 빈 방 30분 / 글 있는 방 24시간
 ├── docs/
 │   └── PERMISSIONS.md        # Android/iOS 권한 & 스토어 제출 가이드
 └── src/

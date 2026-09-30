@@ -34,7 +34,7 @@ export const WRONG_NETWORK_MESSAGE = '와이파이가 바뀌었어요. 지금 �
 
 const ERROR_MESSAGES: Record<string, string> = {
   WRONG_NETWORK: WRONG_NETWORK_MESSAGE,
-  ROOM_NOT_FOUND: '이 방이 사라졌어요. 24시간 동안 글이 없으면 방이 없어져요.',
+  ROOM_NOT_FOUND: '이 방이 사라졌어요. 글이 없는 방은 30분, 마지막 글 뒤 24시간이 지나면 없어져요.',
   RATE_LIMIT_AUTHOR: '너무 빨라요! 10초 뒤에 다시 남겨주세요.',
   RATE_LIMIT_BOARD: '지금 이 보드에 글이 너무 몰리고 있어요. 잠시 후 다시 시도해 주세요.',
   BANNED_WORD: '욕설이나 비속어가 포함되어 있어요. 표현을 바꿔주세요.',

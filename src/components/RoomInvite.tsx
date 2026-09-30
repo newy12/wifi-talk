@@ -38,7 +38,7 @@ export function RoomInvite({ code }: { code: string }) {
           <Text style={styles.hint}>옆 사람이 카메라로 찍으면 바로 들어와요</Text>
         </View>
       )}
-      <Text style={styles.hint}>코드를 아는 사람만 들어올 수 있어요. 24시간 동안 글이 없으면 방이 사라져요.</Text>
+      <Text style={styles.hint}>코드를 아는 사람만 들어올 수 있어요. 글이 없으면 30분 뒤, 글이 있으면 마지막 글 24시간 뒤에 방이 사라져요.</Text>
     </View>
   );
 }

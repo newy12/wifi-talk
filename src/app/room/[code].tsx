@@ -61,7 +61,7 @@ export default function RoomScreen() {
         <>
           <Text style={styles.title}>방을 찾을 수 없어요</Text>
           <Text style={styles.text}>
-            코드({formatRoomCode(code) || '없음'})를 다시 확인해 주세요. 24시간 동안 글이 없던 방은 사라져요.
+            코드({formatRoomCode(code) || '없음'})를 다시 확인해 주세요. 글이 없는 방은 30분, 마지막 글 뒤 24시간이 지나면 사라져요.
           </Text>
           <Pressable style={styles.button} onPress={goHome}>
             <Text style={styles.buttonText}>처음으로</Text>
