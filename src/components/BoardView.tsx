@@ -100,7 +100,7 @@ export function BoardView({ boardKey, title, shareLabel, onShare, banner, onWron
 
       <View style={styles.statusBar}>
         <Text style={[styles.status, status === 'live' && styles.statusLive]}>{STATUS_LABEL[status]}
-          {status === 'live' && viewers ? ` · ${viewers}명 보는 중` : ''}
+          {status === 'live' && viewers ? ` · ${viewers}명이 보는 중이에요` : ''}
         </Text>
         <Text style={styles.status} numberOfLines={1}>
           {shareNote ?? (me ? `나: ${me}` : '')}
