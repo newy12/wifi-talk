@@ -39,3 +39,9 @@ yarn-error.*
 # generated native folders
 /ios
 /android
+
+# Cloudflare
+.wrangler/
+
+# Playwright MCP 테스트 산출물
+.playwright-mcp/

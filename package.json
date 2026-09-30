@@ -1,22 +1,50 @@
 {
-  "name": "wifi-talk",
+  "name": "wifi-graffiti",
   "version": "1.0.0",
-  "main": "index.ts",
+  "main": "expo-router/entry",
   "dependencies": {
+    "@react-native-async-storage/async-storage": "2.2.0",
+    "@react-native-community/netinfo": "12.0.1",
+    "@supabase/supabase-js": "^2.117.2",
     "expo": "~57.0.26",
+    "expo-constants": "~57.0.20",
+    "expo-linking": "~57.0.11",
+    "expo-location": "~57.0.20",
+    "expo-router": "~57.0.24",
     "expo-status-bar": "~57.0.1",
     "react": "19.2.3",
-    "react-native": "0.86.3"
+    "react-dom": "19.2.3",
+    "react-native": "0.86.3",
+    "react-native-safe-area-context": "~5.7.0",
+    "react-native-screens": "~4.26.0",
+    "react-native-web": "^0.21.2"
   },
   "devDependencies": {
     "@types/react": "~19.2.2",
-    "typescript": "~6.0.3"
+    "eslint": "^9.0.0",
+    "eslint-config-expo": "~57.0.2",
+    "supabase": "^2.118.0",
+    "typescript": "~6.0.3",
+    "wrangler": "^4.145.0"
   },
   "scripts": {
     "start": "expo start",
     "android": "expo start --android",
     "ios": "expo start --ios",
-    "web": "expo start --web"
+    "web": "expo start --web",
+    "typecheck": "tsc --noEmit",
+    "lint": "expo lint",
+    "build:android:preview": "npx eas-cli@latest build -p android --profile preview",
+    "build:ios:preview": "npx eas-cli@latest build -p ios --profile preview",
+    "db:start": "supabase start",
+    "db:stop": "supabase stop",
+    "db:reset": "supabase db reset",
+    "db:push": "supabase db push",
+    "env:local": "node scripts/local-env.mjs",
+    "dev": "expo start --clear",
+    "build:web": "expo export -p web",
+    "preview:web": "npx serve -s dist -l 3000",
+    "deploy:web": "expo export -p web && wrangler deploy"
   },
   "private": true
 }

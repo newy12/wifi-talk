@@ -1,0 +1,14 @@
+{
+  "name": "WiFi Graffiti",
+  "short_name": "WiFi Graffiti",
+  "description": "같은 장소에 있는 사람들끼리 익명 낙서. 24시간 뒤 사라져요.",
+  "lang": "ko",
+  "start_url": "/",
+  "display": "standalone",
+  "background_color": "#0E0E12",
+  "theme_color": "#0E0E12",
+  "icons": [
+    { "src": "/icon-192.png", "sizes": "192x192", "type": "image/png" },
+    { "src": "/icon-512.png", "sizes": "512x512", "type": "image/png" }
+  ]
+}

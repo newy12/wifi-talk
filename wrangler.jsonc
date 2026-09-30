@@ -1,0 +1,13 @@
+// Cloudflare Workers 정적 사이트 배포 설정 (npm run deploy:web)
+// 정적 파일 요청은 Workers 무료 플랜에서 무제한·무료다 (Worker 스크립트 없음).
+{
+  "name": "wifi-graffiti",
+  "compatibility_date": "2026-09-30",
+  "workers_dev": true, // https://wifi-graffiti.wifi-graffiti.workers.dev
+  "preview_urls": false,
+  "assets": {
+    "directory": "./dist",
+    // /board/카페 같은 주소로 바로 들어와도 index.html 을 돌려준다
+    "not_found_handling": "single-page-application"
+  }
+}

@@ -1,0 +1,44 @@
+<!DOCTYPE html>
+<html lang="ko">
+  <head>
+    <meta charset="utf-8" />
+    <meta httpEquiv="X-UA-Compatible" content="IE=edge" />
+    <meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover" />
+    <title>WiFi Graffiti · 지금 여기, 익명 낙서</title>
+    <meta name="description" content="같은 장소에 있는 사람들끼리 익명으로 짧은 글을 남기는 공간. 모든 글은 24시간 뒤 사라집니다." />
+    <meta name="theme-color" content="#0E0E12" />
+    <meta property="og:type" content="website" />
+    <meta property="og:title" content="WiFi Graffiti" />
+    <meta property="og:description" content="지금 이 카페·강의실에 있는 사람들과 익명 낙서. 24시간 뒤 사라져요." />
+    <meta property="og:image" content="/icon-512.png" />
+    <meta name="twitter:card" content="summary" />
+    <!-- 홈 화면에 추가 (PWA 설치) -->
+    <link rel="manifest" href="/manifest.json" />
+    <link rel="apple-touch-icon" href="/apple-touch-icon.png" />
+    <meta name="apple-mobile-web-app-capable" content="yes" />
+    <meta name="apple-mobile-web-app-status-bar-style" content="black-translucent" />
+    <meta name="apple-mobile-web-app-title" content="WiFi Graffiti" />
+    <!-- The `react-native-web` recommended style reset: https://necolas.github.io/react-native-web/docs/setup/#root-element -->
+    <style id="expo-reset">
+      html,
+      body {
+        height: 100%;
+        /* JS 로딩 전 흰 화면 깜빡임 방지 */
+        background-color: #0e0e12;
+      }
+      body {
+        overflow: hidden;
+      }
+      #root {
+        display: flex;
+        height: 100%;
+        flex: 1;
+      }
+    </style>
+  </head>
+
+  <body>
+    <noscript>WiFi Graffiti 를 이용하려면 JavaScript 를 켜주세요.</noscript>
+    <div id="root"></div>
+  </body>
+</html>
