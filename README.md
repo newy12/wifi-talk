@@ -50,9 +50,14 @@ npm run db:start && npm run env:local && npm run dev
 
 | 호스팅 | 방법 | 무료 한도 |
 |---|---|---|
-| **Cloudflare Workers** (현재 사용 중) | `npm run deploy:web` (빌드 + 배포) | 정적 파일 요청 무제한 |
+| **Cloudflare Workers** (현재 사용 중) | **`main` 에 푸시하면 자동 배포** (GitHub Actions `.github/workflows/deploy-web.yml`). 수동: `npm run deploy:web` | 정적 파일 요청 무제한 |
 
-**환경 변수 주의**: `EXPO_PUBLIC_*` 값은 **빌드할 때** 코드에 들어갑니다. `npm run deploy:web`은 내 컴퓨터에서 빌드하므로 `.env.local`의 값이 쓰입니다.
+**자동 배포 흐름**: `git push` → GitHub Actions 가 타입 검사·린트 → 웹 빌드 → Cloudflare 배포 (약 2~3분). 진행 상황은 저장소의 **Actions** 탭에서 확인.
+- 필요한 시크릿: 저장소 Settings → Secrets and variables → Actions → `CLOUDFLARE_API_TOKEN` (Cloudflare → My Profile → API Tokens → "Edit Cloudflare Workers" 템플릿)
+- 문서(`*.md`, `docs/`)와 DB 마이그레이션(`supabase/`)만 바뀐 푸시는 배포하지 않음
+- **DB 구조 변경은 자동 적용되지 않음** → `npm run db:push` 로 직접 적용
+
+**환경 변수 주의**: `EXPO_PUBLIC_*` 값은 **빌드할 때** 코드에 들어갑니다. 자동 배포는 워크플로 파일의 값을, `npm run deploy:web`은 `.env.local`의 값을 씁니다.
 
 운영 Supabase: 프로젝트 `wiki-project` (ref `rwxfbdfjfpyzzqjxuvpn`, 싱가포르 리전). **7일 동안 요청이 없으면 일시정지**되니, 대시보드에서 Restore를 누르면 됩니다.
 
@@ -151,6 +156,7 @@ group by p.id order by p.report_count desc;
 ```
 wifi-talk/
 ├── app.json                  # Expo 설정 (권한, 엔타이틀먼트, 플러그인)
+├── .github/workflows/deploy-web.yml  # main 푸시 → 웹 자동 배포
 ├── eas.json                  # EAS Build 프로필 (앱 출시 때 사용)
 ├── wrangler.jsonc            # Cloudflare Workers 배포 설정 (현재 운영)
 ├── public/                   # 웹 전용: index.html(메타/OG), manifest.json(PWA), 아이콘

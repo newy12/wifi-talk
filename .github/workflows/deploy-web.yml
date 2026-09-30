@@ -1,0 +1,53 @@
+# main 브랜치에 푸시하면 웹을 빌드해서 Cloudflare Workers 에 배포한다.
+# 필요한 설정: GitHub 저장소 Settings → Secrets and variables → Actions 에
+#   CLOUDFLARE_API_TOKEN (Cloudflare "Edit Cloudflare Workers" 템플릿으로 만든 토큰)
+# DB 구조 변경(supabase/migrations)은 자동 적용하지 않는다 → `npm run db:push` 로 따로 적용.
+name: Deploy web
+
+on:
+  push:
+    branches: [main]
+    paths-ignore:
+      - '**.md'
+      - 'docs/**'
+      - 'supabase/**'
+  workflow_dispatch:
+
+concurrency:
+  group: deploy-web
+  cancel-in-progress: true
+
+jobs:
+  deploy:
+    runs-on: ubuntu-latest
+    env:
+      # 공개용 값 (배포된 웹 파일에 원래 들어가는 값). 보안은 Supabase RLS 가 담당한다.
+      EXPO_PUBLIC_SUPABASE_URL: https://rwxfbdfjfpyzzqjxuvpn.supabase.co
+      EXPO_PUBLIC_SUPABASE_ANON_KEY: sb_publishable_Cn5jLCiAWZtvyScaiEW9Eg__dt087gc
+      CLOUDFLARE_ACCOUNT_ID: d4e4d71594cc8fcf8f7892af686c9843
+      CLOUDFLARE_API_TOKEN: ${{ secrets.CLOUDFLARE_API_TOKEN }}
+    steps:
+      - uses: actions/checkout@v4
+
+      - uses: actions/setup-node@v4
+        with:
+          node-version: 22
+          cache: npm
+
+      - run: npm ci
+
+      - name: Typecheck & lint
+        run: |
+          npx tsc --noEmit
+          npx expo lint
+
+      - name: Build web
+        run: npx expo export -p web
+
+      - name: Deploy to Cloudflare
+        if: env.CLOUDFLARE_API_TOKEN != ''
+        run: npx wrangler deploy
+
+      - name: 배포 토큰 없음 안내
+        if: env.CLOUDFLARE_API_TOKEN == ''
+        run: echo "::warning::CLOUDFLARE_API_TOKEN 시크릿이 없어 빌드만 하고 배포는 건너뛰었습니다."
