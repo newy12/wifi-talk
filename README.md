@@ -83,7 +83,7 @@ npm run db:start && npm run env:local && npm run dev
 
 - 보드 키 = `room-` + HMAC(서버 비밀키, 코드). 코드는 32^6 ≈ 10억 가지 (헷갈리는 0/O/1/I 제외), 서버가 무작위로 뽑음
 - REST 읽기는 `x-board-key` 헤더로 방 키를 아는 경우만 허용 → `like.room-*` 목록 조회로 훔쳐볼 수 없음
-- "지금 활발한 보드" 목록에 안 나옴. 방 만들기는 한 네트워크에서 10분에 5개까지
+- "지금 활발한 보드" 목록에 안 나옴. 방 만들기는 한 네트워크에서 10분에 20개까지
 - 24시간 동안 글이 없으면 방이 사라짐 (`purge-idle-rooms` cron)
 
 구현: `supabase/migrations/20261001000500_invite_rooms.sql`, `src/app/room/[code].tsx`, `src/components/RoomInvite.tsx`, `src/lib/rooms.ts`

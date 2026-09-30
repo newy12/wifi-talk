@@ -8,6 +8,9 @@ import { fetchWifiBoard, isOnCellular } from '@/lib/network';
 import { shareLink } from '@/lib/share';
 import { colors, fonts } from '@/lib/theme';
 
+/** 첫 화면으로: 이미 쌓여 있으면 뒤로 가고(첫 화면이 두 개 쌓이지 않게), 링크로 바로 왔으면 교체 */
+const goHome = () => (router.canGoBack() ? router.back() : router.replace('/'));
+
 type State =
   | { kind: 'checking' }
   | { kind: 'confirm' } // 연결 종류를 알 수 없음 (iOS 등) → 사용자에게 확인
@@ -139,7 +142,7 @@ export default function WifiBoardScreen() {
           <Pressable style={styles.button} onPress={() => { setState({ kind: 'checking' }); check(); }}>
             <Text style={styles.buttonText}>다시 확인</Text>
           </Pressable>
-          <Pressable onPress={() => router.replace('/')}>
+          <Pressable onPress={goHome}>
             <Text style={styles.link}>장소 태그로 들어가기</Text>
           </Pressable>
         </>

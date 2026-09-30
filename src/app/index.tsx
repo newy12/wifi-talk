@@ -9,10 +9,11 @@ import { SetupNotice } from '@/components/SetupNotice';
 import { useActiveBoards } from '@/hooks/useActiveBoards';
 import { useConsent } from '@/hooks/useConsent';
 import { useSiteOnlineCount } from '@/hooks/usePresence';
+import { useRecentRooms } from '@/hooks/useRecentRooms';
 import { useRecentTags } from '@/hooks/useRecentTags';
 import { POST_TTL_HOURS, TAG_MAX_LENGTH } from '@/lib/config';
 import { fetchWifiBoard, isOnCellular } from '@/lib/network';
-import { createRoom, isValidRoomCode, normalizeRoomCode } from '@/lib/rooms';
+import { createRoom, formatRoomCode, isValidRoomCode, normalizeRoomCode } from '@/lib/rooms';
 import { isSupabaseConfigured } from '@/lib/supabase';
 import { isGenericSsid, isValidTag, normalizeTag, PLACE_CATEGORIES } from '@/lib/tags';
 import { colors, fonts } from '@/lib/theme';
@@ -58,6 +59,7 @@ export default function PlacePicker() {
   const [roomCode, setRoomCode] = useState('');
   const [roomNote, setRoomNote] = useState<string | null>(null);
   const [creatingRoom, setCreatingRoom] = useState(false);
+  const { rooms: recentRooms, rememberRoom, forgetRoom } = useRecentRooms();
 
   const makeRoom = async () => {
     if (!agreed) {
@@ -69,7 +71,10 @@ export default function PlacePicker() {
     const result = await createRoom();
     setCreatingRoom(false);
     if ('error' in result) setRoomNote(result.error);
-    else router.push({ pathname: '/room/[code]', params: { code: result.code } });
+    else {
+      rememberRoom(result.code, true);
+      router.push({ pathname: '/room/[code]', params: { code: result.code } });
+    }
   };
 
   const enterRoom = () => {
@@ -224,6 +229,30 @@ export default function PlacePicker() {
           </Pressable>
         </View>
         {roomNote && <Text style={styles.roomNote}>{roomNote}</Text>}
+        {recentRooms.length > 0 && (
+          <>
+            <Text style={styles.roomListLabel}>
+              내 방 <Text style={styles.hint}>(이 기기에만 저장 · 길게 눌러 삭제)</Text>
+            </Text>
+            <View style={styles.chips}>
+              {recentRooms.map((r) => (
+                <Chip
+                  key={r.code}
+                  label={`🔒 ${formatRoomCode(r.code)}`}
+                  meta={r.mine ? '내가 만든 방' : undefined}
+                  onPress={() => {
+                    if (!agreed) {
+                      setConsentNudge(true);
+                      return;
+                    }
+                    router.push({ pathname: '/room/[code]', params: { code: r.code } });
+                  }}
+                  onLongPress={() => forgetRoom(r.code)}
+                />
+              ))}
+            </View>
+          </>
+        )}
       </View>
 
       <Text style={styles.or}>또는 장소 이름으로</Text>
@@ -356,6 +385,7 @@ const styles = StyleSheet.create({
   roomJoinRow: { flexDirection: 'row', gap: 8 },
   roomInput: {
     flex: 1,
+    minWidth: 0, // 웹 input 기본 폭(약 20글자) 때문에 좁은 화면에서 입장 버튼이 밀려나지 않게
     height: 46,
     borderRadius: 12,
     backgroundColor: colors.surfaceHigh,
@@ -366,6 +396,7 @@ const styles = StyleSheet.create({
     fontWeight: '700',
   },
   roomJoin: {
+    flexShrink: 0,
     height: 46,
     paddingHorizontal: 20,
     borderRadius: 12,
@@ -374,6 +405,7 @@ const styles = StyleSheet.create({
   },
   roomJoinText: { color: colors.text, fontWeight: '700', fontSize: 15 },
   roomNote: { color: colors.danger, fontSize: 13 },
+  roomListLabel: { color: colors.text, fontSize: 14, fontWeight: '700', marginTop: 4 },
   or: { color: colors.textDim, fontSize: 13, textAlign: 'center', marginTop: 12 },
   wifiButton: {
     height: 48,

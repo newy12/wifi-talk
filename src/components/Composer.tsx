@@ -70,6 +70,7 @@ const styles = StyleSheet.create({
   row: { flexDirection: 'row', alignItems: 'flex-end', gap: 8 },
   input: {
     flex: 1,
+    minWidth: 0, // 좁은 화면에서 남기기 버튼이 밀려나지 않게
     minHeight: 44,
     maxHeight: 120,
     color: colors.text,
@@ -81,6 +82,7 @@ const styles = StyleSheet.create({
     fontFamily: fonts?.post,
   },
   button: {
+    flexShrink: 0,
     height: 44,
     paddingHorizontal: 16,
     borderRadius: 12,
