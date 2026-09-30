@@ -97,6 +97,8 @@ npm run db:start && npm run env:local && npm run dev
 Supabase Realtime **Presence**로 첫 화면에 "지금 N명이 접속 중이에요", 보드에 "N명이 보는 중이에요"을 보여줍니다 (`src/hooks/usePresence.tsx`).
 기기의 익명 태그 기준이라 같은 기기의 탭 여러 개는 1명으로 셉니다. 서버에 저장하지 않고, 글 구독과 같은 웹소켓을 공유하므로 동시 접속 한도를 추가로 쓰지 않습니다.
 
+**오늘 다녀간 사람 수** ("오늘 N명이 다녀갔어요"): 기기마다 무작위 방문자 ID를 두고 한국 시간 기준 하루 한 번만 셉니다 (`record_visit`). 서버에는 해시만 저장, 한 네트워크당 하루 300명까지, 어제 기록은 매일 04:05에 삭제 → DB 용량이 쌓이지 않습니다.
+
 ## 🗺️ 장소 태그 보드 (SSID 제한 대응)
 
 모바일 OS는 개인정보 보호 때문에 와이파이 이름(SSID) 접근을 강하게 막습니다 (위치 권한 + iOS 전용 엔타이틀먼트 필요, 웹은 불가능).
@@ -172,7 +174,8 @@ wifi-talk/
 │       ├── 20261001000400_purge_cron_history.sql    # cron 실행 기록 정리
 │       ├── 20261001000500_invite_rooms.sql          # 초대 코드 방
 │       ├── 20261001000600_room_rate_limit.sql       # 방 만들기 제한 완화
-│       └── 20261001000700_room_empty_ttl.sql        # 빈 방 30분 / 글 있는 방 24시간
+│       ├── 20261001000700_room_empty_ttl.sql        # 빈 방 30분 / 글 있는 방 24시간
+│       └── 20261001000800_daily_visitors.sql        # 오늘 다녀간 사람 수
 ├── docs/
 │   └── PERMISSIONS.md        # Android/iOS 권한 & 스토어 제출 가이드
 └── src/

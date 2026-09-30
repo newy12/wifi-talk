@@ -16,6 +16,7 @@ import { POST_TTL_HOURS, TAG_MAX_LENGTH } from '@/lib/config';
 import { fetchWifiBoard, isOnCellular } from '@/lib/network';
 import { createRoom, formatRoomCode, isValidRoomCode, normalizeRoomCode } from '@/lib/rooms';
 import { isSupabaseConfigured } from '@/lib/supabase';
+import { recordVisit } from '@/lib/visitors';
 import { isGenericSsid, isValidTag, normalizeTag, PLACE_CATEGORIES } from '@/lib/tags';
 import { colors, fonts } from '@/lib/theme';
 import { timeAgo } from '@/lib/time';
@@ -45,6 +46,7 @@ export default function PlacePicker() {
   const [consentNudge, setConsentNudge] = useState(false);
   const [wifiCount, setWifiCount] = useState<number | null>(null);
   const online = useSiteOnlineCount();
+  const [todayVisitors, setTodayVisitors] = useState<number | null>(null);
 
   const loadWifiCount = useCallback(async () => {
     // 데이터(LTE/5G)일 때의 개수는 통신사 IP 기준이라 의미가 없으므로 표시하지 않는다
@@ -52,13 +54,19 @@ export default function PlacePicker() {
     setWifiCount(board && !board.cellular ? board.post_count : null);
   }, []);
 
+  const loadVisitors = useCallback(async () => {
+    const n = await recordVisit();
+    if (n !== null) setTodayVisitors(n);
+  }, []);
+
   useFocusEffect(
     useCallback(() => {
       loadWifiCount();
-    }, [loadWifiCount]),
+      loadVisitors();
+    }, [loadWifiCount, loadVisitors]),
   );
 
-  const refresh = () => Promise.all([reloadBoards(), loadWifiCount()]);
+  const refresh = () => Promise.all([reloadBoards(), loadWifiCount(), loadVisitors()]);
 
   const [roomCode, setRoomCode] = useState('');
   const [roomNote, setRoomNote] = useState<string | null>(null);
@@ -145,10 +153,19 @@ export default function PlacePicker() {
       contentContainerStyle={styles.content}
       keyboardShouldPersistTaps="handled"
     >
-      {online ? (
-        <View style={styles.online}>
-          <View style={styles.onlineDot} />
-          <Text style={styles.onlineText}>지금 {online}명이 접속 중이에요</Text>
+      {online || todayVisitors ? (
+        <View style={styles.stats}>
+          {online ? (
+            <View style={styles.online}>
+              <View style={styles.onlineDot} />
+              <Text style={styles.onlineText}>지금 {online}명이 접속 중이에요</Text>
+            </View>
+          ) : null}
+          {todayVisitors ? (
+            <View style={styles.online}>
+              <Text style={styles.onlineText}>오늘 {todayVisitors}명이 다녀갔어요</Text>
+            </View>
+          ) : null}
         </View>
       ) : null}
       <Text style={styles.hero}>지금 어디에 있나요?</Text>
@@ -345,6 +362,7 @@ export default function PlacePicker() {
 const styles = StyleSheet.create({
   screen: { flex: 1, backgroundColor: colors.bg },
   content: { padding: 20, gap: 12, paddingBottom: 48, width: '100%', maxWidth: 640, alignSelf: 'center' },
+  stats: { flexDirection: 'row', flexWrap: 'wrap', gap: 6 },
   online: {
     flexDirection: 'row',
     alignItems: 'center',
