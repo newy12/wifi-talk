@@ -1,4 +1,4 @@
-import { Linking, Pressable, ScrollView, StyleSheet } from 'react-native';
+import { Linking, Pressable, ScrollView, StyleSheet, View } from 'react-native';
 import { Text } from '@/components/Typography';
 import { useHiddenContent } from '@/hooks/useHiddenContent';
 import { CONTACT_EMAIL, POST_TTL_HOURS, REPORT_HIDE_THRESHOLD } from '@/lib/config';
@@ -6,7 +6,7 @@ import { colors, fonts } from '@/lib/theme';
 
 /** 운영정책 + 개인정보처리방침. 스토어 심사용 공개 URL 로도 그대로 쓸 수 있다 (웹: /about). */
 export default function AboutScreen() {
-  const { blockedAuthors, clearBlocked } = useHiddenContent();
+  const { blockedAuthors, unblockAuthor, clearBlocked } = useHiddenContent();
 
   return (
     <ScrollView style={styles.screen} contentContainerStyle={styles.content}>
@@ -58,13 +58,25 @@ export default function AboutScreen() {
         <Text style={styles.link}>{CONTACT_EMAIL}</Text>
       </Pressable>
 
-      {blockedAuthors.length > 0 && (
+      <Text style={styles.h1}>차단 목록</Text>
+      {blockedAuthors.length === 0 ? (
+        <Text style={styles.p}>가린 사람이 없어요. 글의 ⋯ 메뉴에서 특정 사람의 글을 모두 가릴 수 있어요.</Text>
+      ) : (
         <>
-          <Text style={styles.h1}>차단 목록</Text>
-          <Text style={styles.p}>{blockedAuthors.join(', ')}</Text>
-          <Pressable onPress={clearBlocked} style={styles.button}>
-            <Text style={styles.buttonText}>차단 모두 해제</Text>
-          </Pressable>
+          <Text style={styles.p}>이 기기에서 가린 사람들이에요. 해제하면 그 사람의 글이 다시 보여요.</Text>
+          {blockedAuthors.map((tag) => (
+            <View key={tag} style={styles.blockedRow}>
+              <Text style={styles.blockedTag}>{tag}</Text>
+              <Pressable onPress={() => unblockAuthor(tag)} style={styles.button}>
+                <Text style={styles.buttonText}>해제</Text>
+              </Pressable>
+            </View>
+          ))}
+          {blockedAuthors.length > 1 && (
+            <Pressable onPress={clearBlocked} style={[styles.button, styles.clearAll]}>
+              <Text style={styles.buttonText}>모두 해제</Text>
+            </Pressable>
+          )}
         </>
       )}
     </ScrollView>
@@ -89,4 +101,16 @@ const styles = StyleSheet.create({
     marginTop: 4,
   },
   buttonText: { color: colors.text },
+  blockedRow: {
+    flexDirection: 'row',
+    alignItems: 'center',
+    justifyContent: 'space-between',
+    backgroundColor: colors.surface,
+    borderRadius: 10,
+    paddingLeft: 14,
+    paddingRight: 8,
+    paddingVertical: 6,
+  },
+  blockedTag: { color: colors.text, fontSize: 15, fontWeight: '600' },
+  clearAll: { marginTop: 8 },
 });

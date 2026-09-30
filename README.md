@@ -122,7 +122,7 @@ Supabase Realtime **Presence**로 첫 화면에 "지금 N명이 접속 중이에
 |---|---|
 | 첫 입장 시 운영정책·개인정보처리방침 동의 (딥링크로 들어와도 적용) | `src/hooks/useConsent.ts` |
 | 글 ⋯ 메뉴 → 신고 (사유 5종). 서로 다른 3명이 신고하면 모두에게서 자동 숨김 | `report_post()`, `PostActionSheet.tsx` |
-| 작성자 차단 (그 익명 태그의 글을 모든 보드에서 숨김, 기기 로컬) | `useHiddenContent.ts` |
+| 작성자 차단 (그 익명 태그의 글을 모든 보드에서 숨김, 기기 로컬). 보드의 "가린 사람의 글 N개" 또는 운영정책 화면에서 한 명씩 해제 | `useHiddenContent.ts` |
 | 금칙어 필터 — 운영 중 추가: `insert into banned_words (word) values ('단어');` | `20261001000100_moderation.sql` |
 | 전화번호 게시 차단 | 동일 |
 | 운영정책 / 개인정보처리방침 / 차단 해제 화면 | `src/app/about.tsx` (웹 `/about`, 스토어 제출 시 방침 URL로 사용) |

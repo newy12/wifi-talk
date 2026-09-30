@@ -37,8 +37,18 @@ type Props = {
 /** 보드 화면 공통: 실시간 글 목록 + 작성 + 신고/차단. 장소 태그 보드와 와이파이 보드가 함께 쓴다. */
 export function BoardView({ boardKey, title, shareLabel, onShare, banner, onWrongNetwork }: Props) {
   const { posts, status, error, submit, report } = useBoardPosts(boardKey);
-  const { isHidden, hidePost, blockAuthor } = useHiddenContent();
+  const { isHidden, hidePost, blockAuthor, unblockAuthor, blockedAuthors } = useHiddenContent();
   const visiblePosts = useMemo(() => posts.filter((p) => !isHidden(p)), [posts, isHidden]);
+  // 이 보드에서 내가 차단한 사람의 글 (작성자별 개수)
+  const blockedHere = useMemo(() => {
+    const counts = new Map<string, number>();
+    for (const p of posts) {
+      if (blockedAuthors.includes(p.author_tag)) counts.set(p.author_tag, (counts.get(p.author_tag) ?? 0) + 1);
+    }
+    return [...counts.entries()];
+  }, [posts, blockedAuthors]);
+  const blockedHereTotal = blockedHere.reduce((sum, [, n]) => sum + n, 0);
+  const [showBlocked, setShowBlocked] = useState(false);
   const [menuPost, setMenuPost] = useState<Post | null>(null);
   const [shareNote, setShareNote] = useState<string | null>(null);
   const [me, setMe] = useState<string | null>(null);
@@ -109,6 +119,26 @@ export function BoardView({ boardKey, title, shareLabel, onShare, banner, onWron
 
       {banner ? <Text style={styles.banner}>{banner}</Text> : null}
 
+      {blockedHereTotal > 0 && (
+        <View style={styles.blocked}>
+          <Pressable onPress={() => setShowBlocked((v) => !v)} style={styles.blockedHeader}>
+            <Text style={styles.blockedText}>🚫 가린 사람의 글 {blockedHereTotal}개</Text>
+            <Text style={styles.blockedToggle}>{showBlocked ? '접기' : '보기'}</Text>
+          </Pressable>
+          {showBlocked &&
+            blockedHere.map(([tag, n]) => (
+              <View key={tag} style={styles.blockedRow}>
+                <Text style={styles.blockedTag}>
+                  {tag} <Text style={styles.blockedCount}>· 글 {n}개</Text>
+                </Text>
+                <Pressable onPress={() => unblockAuthor(tag)} style={styles.unblock} hitSlop={6}>
+                  <Text style={styles.unblockText}>해제</Text>
+                </Pressable>
+              </View>
+            ))}
+        </View>
+      )}
+
       {!isSupabaseConfigured ? (
         <View style={styles.center}>
           <SetupNotice />
@@ -156,6 +186,28 @@ const styles = StyleSheet.create({
   },
   status: { color: colors.textDim, fontSize: 12 },
   statusLive: { color: colors.accent },
+  blocked: {
+    marginHorizontal: 12,
+    marginTop: 4,
+    borderRadius: 10,
+    borderWidth: 1,
+    borderColor: colors.border,
+    backgroundColor: colors.surface,
+    paddingHorizontal: 12,
+    paddingVertical: 8,
+    gap: 6,
+    width: 'auto',
+    maxWidth: 616,
+    alignSelf: 'stretch',
+  },
+  blockedHeader: { flexDirection: 'row', justifyContent: 'space-between', alignItems: 'center' },
+  blockedText: { color: colors.textDim, fontSize: 13 },
+  blockedToggle: { color: colors.accent, fontSize: 13, fontWeight: '600' },
+  blockedRow: { flexDirection: 'row', justifyContent: 'space-between', alignItems: 'center', paddingVertical: 4 },
+  blockedTag: { color: colors.text, fontSize: 14, fontWeight: '600' },
+  blockedCount: { color: colors.textDim, fontWeight: '400' },
+  unblock: { paddingHorizontal: 12, paddingVertical: 5, borderRadius: 8, borderWidth: 1, borderColor: colors.border },
+  unblockText: { color: colors.text, fontSize: 13 },
   banner: {
     color: colors.accentText,
     backgroundColor: colors.accent,
