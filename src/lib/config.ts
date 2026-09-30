@@ -19,3 +19,10 @@ export type ReportReason = (typeof REPORT_REASONS)[number]['value'];
 
 /** 스토어 제출 전 실제 운영자 연락처로 교체하세요 (App Store 1.2 필수 항목) */
 export const CONTACT_EMAIL = 'newy12@naver.com';
+
+/** 메인 하단 "개발자에게 커피 한 잔" 후원 계좌. null 이면 후원 카드를 숨긴다. */
+export const DONATION_ACCOUNT: { bank: string; number: string; holder: string } | null = {
+  bank: 'KB국민은행',
+  number: '630901-04-116491',
+  holder: '김영재',
+};

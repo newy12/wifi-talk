@@ -11,6 +11,7 @@ import {
 } from 'react-native';
 import { Link, router, useFocusEffect, useLocalSearchParams } from 'expo-router';
 import { Chip } from '@/components/Chip';
+import { DonationCard } from '@/components/DonationCard';
 import { SetupNotice } from '@/components/SetupNotice';
 import { useActiveBoards } from '@/hooks/useActiveBoards';
 import { useConsent } from '@/hooks/useConsent';
@@ -220,6 +221,8 @@ export default function PlacePicker() {
           </View>
         </>
       )}
+
+      <DonationCard />
 
       <Link href="/about" style={styles.footer}>
         운영정책 · 개인정보처리방침 · 차단 관리
