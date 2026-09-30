@@ -1,6 +1,7 @@
 import { useCallback, useState } from 'react';
 import { ActivityIndicator, Platform, Pressable, StyleSheet, View } from 'react-native';
 import { Text, TextInput } from '@/components/Typography';
+import Constants from 'expo-constants';
 import { Link, router, useFocusEffect, useLocalSearchParams } from 'expo-router';
 import { Chip } from '@/components/Chip';
 import { DonationCard } from '@/components/DonationCard';
@@ -29,6 +30,9 @@ import { describeSsidFailure, detectSsid } from '@/lib/wifi';
  *   3) 최근 방문한 장소
  *   4) 지금 활발한 보드
  */
+/** app.json 의 version (예: 0.0.1). 올릴 때는 app.json·package.json 을 함께 바꾼다 */
+const APP_VERSION = Constants.expoConfig?.version;
+
 export default function PlacePicker() {
   const { next, wifi, room } = useLocalSearchParams<{ next?: string; wifi?: string; room?: string }>();
   const [input, setInput] = useState(next ?? ''); // 공유 링크로 들어왔으면 그 보드를 미리 채워둔다
@@ -328,9 +332,12 @@ export default function PlacePicker() {
 
       <DonationCard />
 
-      <Link href="/about" style={styles.footer}>
-        운영정책 · 개인정보처리방침 · 차단 관리
-      </Link>
+      <View style={styles.footerRow}>
+        <Link href="/about" style={styles.footer}>
+          운영정책 · 개인정보처리방침 · 차단 관리
+        </Link>
+        {APP_VERSION ? <Text style={styles.version}>v{APP_VERSION}</Text> : null}
+      </View>
     </PullToRefreshScrollView>
   );
 }
@@ -456,5 +463,7 @@ const styles = StyleSheet.create({
   consentLink: { color: colors.textDim, fontSize: 13, textDecorationLine: 'underline' },
   consentButton: { backgroundColor: colors.accent, borderRadius: 10, paddingHorizontal: 14, paddingVertical: 10 },
   consentButtonText: { color: colors.accentText, fontWeight: '700' },
-  footer: { color: colors.textDim, fontSize: 12, textAlign: 'center', marginTop: 32, textDecorationLine: 'underline' },
+  footerRow: { flexDirection: 'row', justifyContent: 'center', alignItems: 'center', gap: 10, marginTop: 32 },
+  footer: { color: colors.textDim, fontSize: 12, textDecorationLine: 'underline' },
+  version: { color: colors.textDim, fontSize: 12, opacity: 0.6 },
 });

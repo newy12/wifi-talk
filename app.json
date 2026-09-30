@@ -3,7 +3,7 @@
     "name": "담벼락",
     "slug": "wifi-graffiti",
     "scheme": "wifigraffiti",
-    "version": "1.0.0",
+    "version": "0.0.1",
     "orientation": "portrait",
     "icon": "./assets/icon.png",
     "userInterfaceStyle": "dark",
