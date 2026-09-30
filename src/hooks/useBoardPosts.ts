@@ -22,7 +22,10 @@ function mergeNewestFirst(prev: Post[], incoming: Post[]): Post[] {
   return liveNewestFirst(byId.values());
 }
 
+export const WRONG_NETWORK_MESSAGE = '와이파이가 바뀌었어요. 지금 연결된 와이파이의 보드로 옮길게요.';
+
 const ERROR_MESSAGES: Record<string, string> = {
+  WRONG_NETWORK: WRONG_NETWORK_MESSAGE,
   RATE_LIMIT_AUTHOR: '너무 빨라요! 10초 뒤에 다시 남겨주세요.',
   RATE_LIMIT_BOARD: '지금 이 보드에 글이 너무 몰리고 있어요. 잠시 후 다시 시도해 주세요.',
   BANNED_WORD: '욕설이나 비속어가 포함되어 있어요. 표현을 바꿔주세요.',

@@ -16,6 +16,7 @@ export default function RootLayout() {
       >
         <Stack.Screen name="index" options={{ title: 'WiFi Graffiti' }} />
         <Stack.Screen name="board/[tag]" options={{ title: '' }} />
+        <Stack.Screen name="wifi" options={{ title: '📶 이 와이파이' }} />
         <Stack.Screen name="about" options={{ title: '운영정책 · 개인정보' }} />
       </Stack>
     </>

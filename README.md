@@ -59,7 +59,25 @@ npm run db:start && npm run env:local && npm run dev
 
 ---
 
-## 🗺️ 장소는 어떻게 정하나? (SSID 제한 대응)
+## 📶 같은 와이파이 보드 (`/wifi`)
+
+같은 공유기에 연결된 기기들은 인터넷에 나갈 때 **같은 공인 IP**를 씁니다. 서버가 요청의 IP로 보드를 정해서, 같은 와이파이 사람끼리만 묶습니다. 사용자는 아무것도 입력하지 않습니다.
+
+- 보드 키 = `wifi-` + HMAC(서버 비밀키, 네트워크 ‖ ISO 주차). IPv4는 주소, IPv6는 /64 대역 기준. **IP 원본은 저장하지 않고**, 키는 매주 바뀜
+- IP는 Supabase 앞단 Cloudflare가 넣는 `cf-connecting-ip`를 사용. 클라이언트가 위조하면 Cloudflare가 403으로 거부
+- 쓰기·REST 읽기는 지금 그 네트워크에 있는 사람만 (트리거 + RLS). Realtime은 추측 불가능한 키로 보호
+- 와이파이가 바뀌면 1분 안에(앱 복귀·재연결 시 즉시) 새 네트워크의 보드로 자동 이동
+- 휴대폰 데이터(LTE/5G)는 통신사가 여러 사람에게 같은 IP를 줘서 섞이므로 차단. 세 단계로 확인:
+    1. 기기가 알려주는 경우 (Android Chrome, 앱) → 즉시 차단
+    2. **서버가 IP로 확인**: 국내 이동통신 3사 데이터망 대역(`private.mobile_networks`)이면 보드 키를 주지 않음 → iOS에서 "와이파이예요"를 눌러도 막힘. 쓰기·읽기도 서버에서 거부
+    3. 그래도 모르는 경우(목록에 없는 해외 통신사·일부 알뜰폰) 대비로, 기기가 알려주지 않으면 입장 전에 "와이파이에 연결되어 있나요?"를 한 번 물어봄
+- 데이터망 대역 목록 출처: [위키백과:이동통신사 IP 주소](https://ko.wikipedia.org/wiki/%EC%9C%84%ED%82%A4%EB%B0%B1%EA%B3%BC:%ED%86%B5%EC%8B%A0%EC%82%AC_IP) + RIPEstat 라우팅·WHOIS 교차 확인 (2026-10). 통신사가 대역을 바꾸면 `insert into private.mobile_networks ...` 로 추가
+- 데이터 연결일 때는 첫 화면의 "지금 글 N개"를 숨김 (통신사 IP 기준 숫자라 의미 없음)
+- 한계: 출구 IP가 여러 개인 대형 네트워크(대학교 등)는 보드가 나뉠 수 있고, VPN 사용자는 VPN 서버 기준으로 묶임 → 이런 곳은 장소 태그 보드 사용
+
+구현: `supabase/migrations/20261001000200_wifi_boards.sql`, `src/app/wifi.tsx`, `src/lib/network.ts`
+
+## 🗺️ 장소 태그 보드 (SSID 제한 대응)
 
 모바일 OS는 개인정보 보호 때문에 와이파이 이름(SSID) 접근을 강하게 막습니다 (위치 권한 + iOS 전용 엔타이틀먼트 필요, 웹은 불가능).
 그래서 **와이파이 자동 감지는 보조 수단**이고, 기본 흐름은 **사용자가 장소 태그를 직접 정하는 것**입니다.
@@ -127,16 +145,19 @@ wifi-talk/
 │   ├── config.toml           # 로컬 Supabase 설정 (supabase start)
 │   └── migrations/
 │       ├── 20261001000000_init.sql        # 테이블, RLS, TTL, 도배 제한, Realtime, pg_cron
-│       └── 20261001000100_moderation.sql  # 신고, 금칙어, 개인정보 필터
+│       ├── 20261001000100_moderation.sql  # 신고, 금칙어, 개인정보 필터
+│       ├── 20261001000200_wifi_boards.sql # 같은 와이파이 보드 (IP 해시, 네트워크 검증)
+│       └── 20261001000300_block_mobile_networks.sql # 이동통신 데이터망 IP 차단
 ├── docs/
 │   └── PERMISSIONS.md        # Android/iOS 권한 & 스토어 제출 가이드
 └── src/
     ├── app/                  # Expo Router 화면 (파일 = 라우트)
     │   ├── _layout.tsx
     │   ├── index.tsx         # 장소 선택 (SSID 감지 + 수동 태그 + 동의)
-    │   ├── board/[tag].tsx   # 메인 보드: 실시간 조회 + 작성 + 신고/차단
+    │   ├── wifi.tsx          # 같은 와이파이 보드 (네트워크 자동 감지·전환)
+    │   ├── board/[tag].tsx   # 장소 태그 보드
     │   └── about.tsx         # 운영정책 · 개인정보처리방침
-    ├── components/           # Chip, Composer, PostItem, PostActionSheet, SetupNotice
+    ├── components/           # BoardView(보드 공통 화면), Chip, Composer, PostItem, PostActionSheet, SetupNotice
     ├── hooks/                # useBoardPosts, useActiveBoards, useRecentTags, useHiddenContent, useConsent
     └── lib/                  # supabase 클라이언트, 태그 정규화, SSID 감지, 링크 공유, 익명 ID, 설정값
 ```

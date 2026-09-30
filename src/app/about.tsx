@@ -26,9 +26,17 @@ export default function AboutScreen() {
       <Text style={styles.li}>• 작성한 글 내용, 장소 태그, 작성 시각</Text>
       <Text style={styles.li}>• 기기에서 무작위로 만든 익명 태그 (예: 익명-3F2A)</Text>
       <Text style={styles.li}>• 신고 시 신고 사유</Text>
+      <Text style={styles.li}>• &quot;이 와이파이&quot; 보드 이용 시 네트워크 식별값 (IP 주소를 해시한 값, 아래 참고)</Text>
       <Text style={styles.p}>이름, 이메일, 전화번호, 계정, 광고 식별자는 수집하지 않습니다.</Text>
 
-      <Text style={styles.h2}>위치 권한과 와이파이 이름</Text>
+      <Text style={styles.h2}>&quot;이 와이파이&quot; 보드와 IP 주소</Text>
+      <Text style={styles.p}>
+        같은 와이파이 사람끼리 묶기 위해, 서버가 접속한 네트워크의 공인 IP 주소를 되돌릴 수 없는 값(해시)으로 바꿔 보드를
+        구분합니다. IP 주소 원본은 저장하지 않으며, 이 값은 매주 바뀝니다. 휴대폰 데이터로 접속하면 이 보드를 이용할 수
+        없습니다.
+      </Text>
+
+      <Text style={styles.h2}>위치 권한과 와이파이 이름 (앱)</Text>
       <Text style={styles.p}>
         &quot;와이파이 이름으로 찾기&quot;를 누를 때만 위치 권한을 요청합니다. 운영체제 정책상 와이파이 이름(SSID)을 읽으려면 위치
         권한이 필요하기 때문입니다. 위치 좌표는 읽지 않으며, 와이파이 이름은 서버로 보내지 않습니다. 사용자가 입장 버튼을 눌러

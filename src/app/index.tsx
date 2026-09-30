@@ -1,4 +1,4 @@
-import { useState } from 'react';
+import { useCallback, useState } from 'react';
 import {
   ActivityIndicator,
   Platform,
@@ -9,13 +9,14 @@ import {
   TextInput,
   View,
 } from 'react-native';
-import { Link, router, useLocalSearchParams } from 'expo-router';
+import { Link, router, useFocusEffect, useLocalSearchParams } from 'expo-router';
 import { Chip } from '@/components/Chip';
 import { SetupNotice } from '@/components/SetupNotice';
 import { useActiveBoards } from '@/hooks/useActiveBoards';
 import { useConsent } from '@/hooks/useConsent';
 import { useRecentTags } from '@/hooks/useRecentTags';
 import { POST_TTL_HOURS, TAG_MAX_LENGTH } from '@/lib/config';
+import { fetchWifiBoard, isOnCellular } from '@/lib/network';
 import { isSupabaseConfigured } from '@/lib/supabase';
 import { isGenericSsid, isValidTag, normalizeTag, PLACE_CATEGORIES } from '@/lib/tags';
 import { colors } from '@/lib/theme';
@@ -32,7 +33,7 @@ import { describeSsidFailure, detectSsid } from '@/lib/wifi';
  *   4) 지금 활발한 보드
  */
 export default function PlacePicker() {
-  const { next } = useLocalSearchParams<{ next?: string }>();
+  const { next, wifi } = useLocalSearchParams<{ next?: string; wifi?: string }>();
   const [input, setInput] = useState(next ?? ''); // 공유 링크로 들어왔으면 그 보드를 미리 채워둔다
   const [category, setCategory] = useState<string | null>(null);
   const [detecting, setDetecting] = useState(false);
@@ -41,6 +42,28 @@ export default function PlacePicker() {
   const activeBoards = useActiveBoards();
   const { agreed, agree } = useConsent();
   const [consentNudge, setConsentNudge] = useState(false);
+  const [wifiCount, setWifiCount] = useState<number | null>(null);
+
+  useFocusEffect(
+    useCallback(() => {
+      let cancelled = false;
+      // 데이터(LTE/5G)일 때의 개수는 통신사 IP 기준이라 의미가 없으므로 표시하지 않는다
+      isOnCellular()
+        .then((cellular) => (cellular === true ? null : fetchWifiBoard()))
+        .then((b) => !cancelled && setWifiCount(b && !b.cellular ? b.post_count : null));
+      return () => {
+        cancelled = true;
+      };
+    }, []),
+  );
+
+  const enterWifi = () => {
+    if (!agreed) {
+      setConsentNudge(true);
+      return;
+    }
+    router.push('/wifi');
+  };
 
   const composed = normalizeTag(category ? `${category} ${input}` : input);
   const canEnter = isValidTag(composed);
@@ -81,7 +104,7 @@ export default function PlacePicker() {
     <ScrollView style={styles.screen} contentContainerStyle={styles.content} keyboardShouldPersistTaps="handled">
       <Text style={styles.hero}>지금 어디에 있나요?</Text>
       <Text style={styles.sub}>
-        같은 장소 태그를 고른 사람들끼리 익명으로 낙서를 공유해요. 모든 글은 {POST_TTL_HOURS}시간 뒤 사라집니다.
+        같은 와이파이, 같은 장소에 있는 사람들끼리 익명으로 낙서를 나눠요. 모든 글은 {POST_TTL_HOURS}시간 뒤 사라집니다.
       </Text>
 
       {!isSupabaseConfigured && <SetupNotice />}
@@ -102,6 +125,10 @@ export default function PlacePicker() {
                 agree();
                 setConsentNudge(false);
                 // 공유 링크로 들어왔다가 동의 화면으로 온 경우, 원래 보드로 보낸다
+                if (wifi) {
+                  router.replace('/wifi');
+                  return;
+                }
                 const target = normalizeTag(next ?? '');
                 if (isValidTag(target)) {
                   remember(target);
@@ -115,18 +142,28 @@ export default function PlacePicker() {
         </View>
       )}
 
+      <Pressable style={styles.wifiBoard} onPress={enterWifi}>
+        <Text style={styles.wifiBoardTitle}>📶  지금 이 와이파이 사람들</Text>
+        <Text style={styles.wifiBoardSub}>
+          같은 와이파이에 연결된 사람끼리만 보이는 보드예요. 입력할 것 없이 바로 들어가요.
+          {wifiCount ? `  지금 글 ${wifiCount}개` : ''}
+        </Text>
+      </Pressable>
+
+      <Text style={styles.or}>또는 장소 이름으로</Text>
+
       {Platform.OS !== 'web' && (
         <Pressable style={styles.wifiButton} onPress={onDetect} disabled={detecting}>
           {detecting ? (
             <ActivityIndicator color={colors.accent} />
           ) : (
-            <Text style={styles.wifiButtonText}>📶  현재 와이파이 이름으로 찾기</Text>
+            <Text style={styles.wifiButtonText}>와이파이 이름으로 장소 태그 채우기</Text>
           )}
         </Pressable>
       )}
       {wifiNote && <Text style={styles.note}>{wifiNote}</Text>}
 
-      <Text style={styles.section}>장소 직접 입력</Text>
+      <Text style={styles.section}>장소 태그 입력</Text>
       <View style={styles.chips}>
         {PLACE_CATEGORIES.map((c) => (
           <Chip key={c} label={c} active={category === c} onPress={() => setCategory(category === c ? null : c)} />
@@ -196,6 +233,16 @@ const styles = StyleSheet.create({
   content: { padding: 20, gap: 12, paddingBottom: 48, width: '100%', maxWidth: 640, alignSelf: 'center' },
   hero: { color: colors.text, fontSize: 28, fontWeight: '800' },
   sub: { color: colors.textDim, fontSize: 14, lineHeight: 20 },
+  wifiBoard: {
+    backgroundColor: colors.accent,
+    borderRadius: 16,
+    padding: 18,
+    gap: 6,
+    marginTop: 8,
+  },
+  wifiBoardTitle: { color: colors.accentText, fontSize: 19, fontWeight: '800' },
+  wifiBoardSub: { color: colors.accentText, fontSize: 13, lineHeight: 19, opacity: 0.8 },
+  or: { color: colors.textDim, fontSize: 13, textAlign: 'center', marginTop: 12 },
   wifiButton: {
     height: 48,
     borderRadius: 12,
